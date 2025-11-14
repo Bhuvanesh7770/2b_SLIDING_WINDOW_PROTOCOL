@@ -8,58 +8,39 @@
 5. If your frames reach the server it will send ACK signal to client
 6. Stop the Program
 ## PROGRAM
-
-server.py
+server
 ```
+
 import socket
-s = socket.socket()
-s.bind(('localhost', 9999))
-s.listen(1)
-print("Server listening...")
-conn, addr = s.accept()
-print(f"Connected to {addr}")
-
+s=socket.socket()
+s.bind(('localhost',8004))
+s.listen(5)
+c,addr=s.accept()
+size=int(input("Enter number of frames to send : "))
+l=list(range(size))
+s=int(input("Enter Window Size : "))
+st=0
+i=0
 while True:
-    frames = conn.recv(1024).decode()
-    if not frames:
-        break
-
-    print(f"Received frames: {frames}")
-    ack_message = f"ACK for frames: {frames}"
-    conn.send(ack_message.encode())
-
-conn.close()  
-s.close()
-```
-client.py
-```
-import socket
-c = socket.socket()
-c.connect(('localhost', 9999))
-
-size = int(input("Enter number of frames to send: "))
-l = list(range(size))  
-print("Total frames to send:", len(l))
-s = int(input("Enter Window Size: "))
-
-i = 0
-while True:
-    while i < len(l):
-        st = i + s
-        frames_to_send = l[i:st]  
-        print(f"Sending frames: {frames_to_send}")
-        c.send(str(frames_to_send).encode())  
-
-        ack = c.recv(1024).decode()  
+    while(i<len(l)):
+        st+=s
+        c.send(str(l[i:st]).encode())
+        ack=c.recv(1024).decode()
         if ack:
-            print(f"Acknowledgment received: {ack}")
-            i += s  
-
-    break
-c.close()
+            print(ack)
+            i+=s
+```
+client
+```
+import socket
+s=socket.socket()
+s.connect(('localhost',8004))
+while True: 
+    print(s.recv(1024).decode())
+    s.send("acknowledgement recived from the server".encode())
 ```
 ## OUPUT
+<img width="1058" height="635" alt="image" src="https://github.com/user-attachments/assets/14c0ac4b-7267-4090-b39e-5430be8e9e94" />
 
-![alt text](image.png)
 ## RESULT
 Thus, python program to perform stop and wait protocol was successfully executed
